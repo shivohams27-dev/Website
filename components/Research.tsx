@@ -37,7 +37,7 @@ export function Research({ papers, stageColors, exploreUrl }: { papers: Research
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: papers.length * 0.1 }}
           >
-            <PlusCard label="All Publications" url={exploreUrl} />
+            <PlusCard label="Add Publication" url={exploreUrl} />
           </motion.div>
         </div>
       </motion.div>

@@ -37,7 +37,7 @@ export function Projects({ projects, stageColors, exploreUrl }: { projects: Proj
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: projects.length * 0.1 }}
           >
-            <PlusCard label="See all projects" url={exploreUrl} />
+            <PlusCard label="Add Project" url={exploreUrl} />
           </motion.div>
         </div>
       </motion.div>

@@ -8,6 +8,9 @@ export interface SiteConfig {
   discord_url?: string;
   whatsapp_url?: string;
   form_url?: string;
+  telegram_url?: string;
+  custom_links?: { label: string; url: string }[];
+  social_links?: { label: string; url: string }[];
   updated_at: string;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LogOut, Home } from "lucide-react";
+import { LogOut, Home, Plus, X, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "./Toast";
 import { SiteConfig } from "@/lib/types";
@@ -123,6 +123,160 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                 <div>
                   <label className="block font-jetbrains text-xs text-text-muted mb-2">Joining Form URL</label>
                   <input type="text" value={config.form_url || ""} onChange={e => setConfig({...config, form_url: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
+                </div>
+                <div>
+                  <label className="block font-jetbrains text-xs text-text-muted mb-2">Telegram Channel URL</label>
+                  <input type="text" value={config.telegram_url || ""} onChange={e => setConfig({...config, telegram_url: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
+                </div>
+
+                <div className="pt-4 border-t border-border mt-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block font-jetbrains text-xs text-text-muted">Custom Community Links</label>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const newLinks = [...(config.custom_links || []), { label: "", url: "" }];
+                        setConfig({...config, custom_links: newLinks});
+                      }}
+                      className="text-xs flex items-center gap-1 text-accent hover:text-white transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add Link
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-3">
+                    {config.custom_links?.map((link, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <div className="flex-1 space-y-2">
+                          <input 
+                            type="text" 
+                            placeholder="Link Label (e.g. YouTube)" 
+                            value={link.label} 
+                            onChange={e => {
+                              const newLinks = [...config.custom_links!];
+                              newLinks[idx].label = e.target.value;
+                              setConfig({...config, custom_links: newLinks});
+                            }} 
+                            className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none" 
+                          />
+                          <input 
+                            type="text" 
+                            placeholder="URL (e.g. https://youtube.com/...)" 
+                            value={link.url} 
+                            onChange={e => {
+                              const newLinks = [...config.custom_links!];
+                              newLinks[idx].url = e.target.value;
+                              setConfig({...config, custom_links: newLinks});
+                            }} 
+                            className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none" 
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const newLinks = config.custom_links!.filter((_, i) => i !== idx);
+                            setConfig({...config, custom_links: newLinks});
+                          }}
+                          className="p-2 text-text-muted hover:text-red-500 transition-colors bg-[#111] border border-border rounded-lg"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {(!config.custom_links || config.custom_links.length === 0) && (
+                      <div className="text-sm text-text-muted text-center p-4 border border-dashed border-border rounded-lg">
+                        No custom links added. Click "Add Link" to add one.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border mt-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block font-jetbrains text-xs text-text-muted">Find Us Online Links (Socials)</label>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        const newLinks = [...(config.social_links || []), { label: "", url: "" }];
+                        setConfig({...config, social_links: newLinks});
+                      }}
+                      className="text-xs flex items-center gap-1 text-accent hover:text-white transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add Link
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-3">
+                    {config.social_links?.map((link, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <div className="flex flex-col gap-1">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => {
+                              const newLinks = [...config.social_links!];
+                              [newLinks[idx - 1], newLinks[idx]] = [newLinks[idx], newLinks[idx - 1]];
+                              setConfig({...config, social_links: newLinks});
+                            }}
+                            className={`p-1.5 rounded-lg border border-border transition-colors ${idx === 0 ? "opacity-50 cursor-not-allowed bg-transparent" : "bg-[#111] hover:text-accent"}`}
+                          >
+                            <ArrowUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === config.social_links!.length - 1}
+                            onClick={() => {
+                              const newLinks = [...config.social_links!];
+                              [newLinks[idx], newLinks[idx + 1]] = [newLinks[idx + 1], newLinks[idx]];
+                              setConfig({...config, social_links: newLinks});
+                            }}
+                            className={`p-1.5 rounded-lg border border-border transition-colors ${idx === config.social_links!.length - 1 ? "opacity-50 cursor-not-allowed bg-transparent" : "bg-[#111] hover:text-accent"}`}
+                          >
+                            <ArrowDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <input 
+                            type="text" 
+                            placeholder="Link Label (e.g. YouTube)" 
+                            value={link.label} 
+                            onChange={e => {
+                              const newLinks = [...config.social_links!];
+                              newLinks[idx].label = e.target.value;
+                              setConfig({...config, social_links: newLinks});
+                            }} 
+                            className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none" 
+                          />
+                          <input 
+                            type="text" 
+                            placeholder="URL (e.g. https://youtube.com/...)" 
+                            value={link.url} 
+                            onChange={e => {
+                              const newLinks = [...config.social_links!];
+                              newLinks[idx].url = e.target.value;
+                              setConfig({...config, social_links: newLinks});
+                            }} 
+                            className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none" 
+                          />
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const newLinks = config.social_links!.filter((_, i) => i !== idx);
+                            setConfig({...config, social_links: newLinks});
+                          }}
+                          className="p-2 text-text-muted hover:text-red-500 transition-colors bg-[#111] border border-border rounded-lg"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {(!config.social_links || config.social_links.length === 0) && (
+                      <div className="text-sm text-text-muted text-center p-4 border border-dashed border-border rounded-lg">
+                        No social links added. Click "Add Link" to add one.
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <button type="submit" className="bg-accent text-black font-semibold py-3 rounded-lg hover:bg-white transition-colors mt-4">
                   Save General Settings

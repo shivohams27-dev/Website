@@ -21,6 +21,12 @@ export async function PUT(request: Request) {
         join_lab_url: body.join_lab_url,
         community_description: body.community_description,
         community_url: body.community_url,
+        discord_url: body.discord_url,
+        whatsapp_url: body.whatsapp_url,
+        form_url: body.form_url,
+        telegram_url: body.telegram_url,
+        custom_links: body.custom_links,
+        social_links: body.social_links,
         updated_at: new Date().toISOString()
       })
       .eq('id', 1);

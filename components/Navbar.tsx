@@ -60,7 +60,7 @@ export function Navbar() {
           >
             <img src="/s.png" alt="Shivoham Lab Logo" className="h-12 w-12 object-contain" />
             <div className="hidden sm:flex flex-col">
-              <span className="font-syne text-[1.1rem] font-bold text-text-primary leading-none">Shivoham Labs</span>
+              <span className="font-syne text-[1.1rem] font-bold text-text-primary leading-none">Shivoham Lab</span>
               <span className="font-jetbrains text-[10px] text-text-muted leading-tight mt-1">Indie Research Lab</span>
             </div>
           </button>

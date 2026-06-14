@@ -1,15 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, ArrowRight, ExternalLink, MessageSquare, MessageCircle, ClipboardList } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "./Icons";
+import { Mail, ArrowRight, ExternalLink, MessageSquare, MessageCircle, ClipboardList, Send } from "lucide-react";
+import { GithubIcon, LinkedinIcon, InstagramIcon, YoutubeIcon, XIcon } from "./Icons";
 import { SiteConfig } from "@/lib/types";
 
 export function Contact({ config }: { config: SiteConfig }) {
-  const socialLinks = [
-    { icon: GithubIcon, label: "GitHub", url: "https://github.com/Shivoham-Lab" },
-    { icon: LinkedinIcon, label: "LinkedIn", url: "https://linkedin.com/company/shivoham-lab" },
-    { icon: Mail, label: "Email", url: "mailto:shivoham.s27@gmail.com" },
+  const getSocialIcon = (label: string) => {
+    const l = label.toLowerCase();
+    if (l.includes("github")) return GithubIcon;
+    if (l.includes("linkedin")) return LinkedinIcon;
+    if (l.includes("instagram") || l.includes("insta")) return InstagramIcon;
+    if (l.includes("youtube")) return YoutubeIcon;
+    if (l.includes("twitter") || l.includes("x.com") || l.match(/^x$/i)) return XIcon;
+    if (l.includes("mail") || l.includes("email")) return Mail;
+    return ExternalLink;
+  };
+
+  const socialLinks = config?.social_links || [
+    { label: "GitHub", url: "https://github.com/Shivoham-Lab" },
+    { label: "LinkedIn", url: "https://linkedin.com/company/shivoham-lab" },
+    { label: "Email", url: "mailto:shivoham.s27@gmail.com" },
   ];
 
   return (
@@ -38,7 +49,7 @@ export function Contact({ config }: { config: SiteConfig }) {
             <h3 className="font-syne text-2xl text-text-primary mb-8">Find us online</h3>
             <div className="flex flex-col gap-4">
               {socialLinks.map((link, i) => {
-                const Icon = link.icon;
+                const Icon = getSocialIcon(link.label);
                 return (
                   <a
                     key={i}
@@ -105,7 +116,28 @@ export function Contact({ config }: { config: SiteConfig }) {
                   <ClipboardList className="w-5 h-5" /> Application Form
                 </a>
               )}
-              {!config?.discord_url && !config?.whatsapp_url && !config?.form_url && config?.community_url && (
+              {config?.telegram_url && (
+                <a
+                  href={config.telegram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-[#229ED9] text-white font-dm font-semibold px-6 py-3 rounded-lg hover:bg-[#1f8ec4] transition-colors w-full"
+                >
+                  <Send className="w-5 h-5" /> Telegram Channel
+                </a>
+              )}
+              {config?.custom_links?.map((link, i) => (
+                <a
+                  key={i}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-[#111] text-white border border-border font-dm font-semibold px-6 py-3 rounded-lg hover:bg-[#222] transition-colors w-full"
+                >
+                  <ExternalLink className="w-5 h-5" /> {link.label}
+                </a>
+              ))}
+              {!config?.discord_url && !config?.whatsapp_url && !config?.form_url && !config?.telegram_url && (!config?.custom_links || config.custom_links.length === 0) && config?.community_url && (
                 <a
                   href={config.community_url}
                   target="_blank"
