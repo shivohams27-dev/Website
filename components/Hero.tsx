@@ -43,7 +43,7 @@ export function Hero({ config }: { config: SiteConfig }) {
           </span>
         </motion.div>
 
-        <motion.h1 variants={itemVariants} className="font-syne text-6xl md:text-8xl font-bold text-text-primary mb-6 tracking-tight">
+        <motion.h1 layoutId="hero-title" variants={itemVariants} className="font-syne text-6xl md:text-8xl font-bold text-text-primary mb-6 tracking-tight">
           Shivoham Lab
         </motion.h1>
 

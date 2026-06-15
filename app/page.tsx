@@ -5,6 +5,7 @@ import { Projects } from "@/components/Projects";
 import { Research } from "@/components/Research";
 import { Team } from "@/components/Team";
 import { Contact } from "@/components/Contact";
+import { InitialLoader } from "@/components/InitialLoader";
 import { SiteConfig, Project, ResearchPaper, TeamMember, StageColor } from "@/lib/types";
 
 // Force dynamic rendering to ensure fresh data (in production you might use ISR)
@@ -33,26 +34,28 @@ export default async function Home() {
   const stageColors = (stageColorsData || []) as StageColor[];
 
   return (
-    <main className="min-h-screen bg-background relative selection:bg-accent/30 selection:text-white">
-      <Navbar />
-      
-      <Hero config={config} />
-      
-      <Projects 
-        projects={projects} 
-        stageColors={stageColors} 
-        exploreUrl={config?.join_lab_url || "#"} 
-      />
-      
-      <Research 
-        papers={research} 
-        stageColors={stageColors} 
-        exploreUrl={config?.join_lab_url || "#"} 
-      />
-      
-      <Team members={team} />
-      
-      <Contact config={config} />
-    </main>
+    <InitialLoader>
+      <main className="min-h-screen bg-background relative selection:bg-accent/30 selection:text-white">
+        <Navbar />
+        
+        <Hero config={config} />
+        
+        <Projects 
+          projects={projects} 
+          stageColors={stageColors} 
+          exploreUrl={config?.join_lab_url || "#"} 
+        />
+        
+        <Research 
+          papers={research} 
+          stageColors={stageColors} 
+          exploreUrl={config?.join_lab_url || "#"} 
+        />
+        
+        <Team members={team} />
+        
+        <Contact config={config} />
+      </main>
+    </InitialLoader>
   );
 }
