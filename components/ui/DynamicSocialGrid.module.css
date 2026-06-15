@@ -1,0 +1,126 @@
+.wrapper {
+  position: relative;
+  width: 14em;
+  height: 14em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainBack {
+  position: absolute;
+  border-radius: 10px;
+  transform: rotate(90deg);
+  width: 11em;
+  height: 11em;
+  background: linear-gradient(270deg, #03a9f4, #cc39a4, #ffb5d2);
+  z-index: 1;
+  box-shadow: inset 0px 0px 180px 5px #111; /* Darkened for dark mode */
+}
+
+.main {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 0px;
+  width: 180px;
+  height: 180px;
+  z-index: 2;
+  transition: transform 0.3s ease-in-out;
+}
+
+.card {
+  background: rgba(40, 40, 40, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.4s ease-in-out, 0.2s background-color ease-in-out, 0.2s border-radius ease-in-out;
+  overflow: hidden;
+  text-decoration: none;
+  position: relative;
+}
+
+/* Base border radii for the 3x3 grid corners when not hovering */
+.topLeft { border-top-left-radius: 10px; }
+.topRight { border-top-right-radius: 10px; }
+.bottomLeft { border-bottom-left-radius: 10px; }
+.bottomRight { border-bottom-right-radius: 10px; }
+
+.centerCard {
+  grid-area: 2 / 2 / 3 / 3;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.hoverText {
+  position: absolute;
+  font-size: 0.7em;
+  transition: 0.4s ease-in-out;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  z-index: 3;
+}
+
+.svgIcon {
+  width: 30px;
+  height: 30px;
+  opacity: 0;
+  transition: 0.2s ease-in-out;
+  fill: #fff;
+}
+
+/* Hover States */
+.wrapper:hover .main {
+  transform: rotate(-45deg);
+  gap: 4px; /* Creates the space between cards on hover */
+  width: 192px; /* 3*60 + 2*4 */
+  height: 192px;
+}
+
+.wrapper:hover .mainBack {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wrapper:hover .card {
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.wrapper:hover .centerCard {
+  border: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.wrapper:hover .card svg {
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+.wrapper:hover .hoverText {
+  opacity: 0;
+  z-index: -3;
+}
+
+/* Brand Colors on Hover */
+.wrapper:hover .card:hover.instagram { background-color: #cc39a4; }
+.wrapper:hover .card:hover.twitter { background-color: #03a9f4; }
+.wrapper:hover .card:hover.linkedin { background-color: #0077b5; }
+.wrapper:hover .card:hover.github { background-color: #000; }
+.wrapper:hover .card:hover.telegram { background-color: #29b6f6; }
+.wrapper:hover .card:hover.youtube { background-color: #ff0000; }
+.wrapper:hover .card:hover.discord { background-color: #5865f2; }
+.wrapper:hover .card:hover.default { background-color: #666; }

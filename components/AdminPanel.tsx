@@ -258,6 +258,25 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                             }} 
                             className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none" 
                           />
+                          <select
+                            value={(link as any).position || "auto"}
+                            onChange={e => {
+                              const newLinks = [...config.social_links!];
+                              (newLinks[idx] as any).position = e.target.value === "auto" ? undefined : e.target.value;
+                              setConfig({...config, social_links: newLinks});
+                            }}
+                            className="w-full bg-[#111] border border-border rounded-lg p-2 text-sm text-text-primary focus:border-accent outline-none"
+                          >
+                            <option value="auto">Auto (Balanced Layout)</option>
+                            <option value="top-left">Top Left</option>
+                            <option value="top-mid">Top Middle</option>
+                            <option value="top-right">Top Right</option>
+                            <option value="mid-right">Middle Right</option>
+                            <option value="bot-right">Bottom Right</option>
+                            <option value="bot-mid">Bottom Middle</option>
+                            <option value="bot-left">Bottom Left</option>
+                            <option value="mid-left">Middle Left</option>
+                          </select>
                         </div>
                         <button 
                           type="button" 

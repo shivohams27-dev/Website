@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GithubIcon, LinkedinIcon, InstagramIcon } from "./Icons";
 import { TeamMember } from "@/lib/types";
+import { TeamSocialIcon } from "./ui/TeamSocialIcon";
 
 export function TeamCard({ member }: { member: TeamMember }) {
   return (
@@ -28,21 +28,15 @@ export function TeamCard({ member }: { member: TeamMember }) {
           </span>
         )}
         
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 pt-4">
           {member.linkedin_url && (
-            <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-[#0077b5] transition-colors">
-              <LinkedinIcon className="w-5 h-5" />
-            </a>
+            <TeamSocialIcon type="linkedin" url={member.linkedin_url} member={member} />
           )}
           {member.instagram_url && (
-            <a href={member.instagram_url} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-[#E1306C] transition-colors">
-              <InstagramIcon className="w-5 h-5" />
-            </a>
+            <TeamSocialIcon type="instagram" url={member.instagram_url} member={member} />
           )}
           {member.github_url && (
-            <a href={member.github_url} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-white transition-colors">
-              <GithubIcon className="w-5 h-5" />
-            </a>
+            <TeamSocialIcon type="github" url={member.github_url} member={member} />
           )}
         </div>
       </div>
@@ -60,6 +54,14 @@ export function TeamCard({ member }: { member: TeamMember }) {
         <p className="font-dm text-text-muted leading-relaxed text-sm">
           {member.bio}
         </p>
+        
+        {member.name === 'Shouraya Sharma' && (
+          <div className="mt-auto pt-6">
+            <p className="font-dm text-text-primary/70 italic border-l-2 border-accent/40 pl-4 text-sm leading-relaxed">
+              "I got tired of waiting to graduate or learn everything on earth to do real work. So I stopped waiting"
+            </p>
+          </div>
+        )}
       </div>
     </motion.div>
   );

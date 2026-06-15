@@ -92,7 +92,7 @@ insert into public.stage_colors (stage, color, label) values
 on conflict (stage) do update set color = excluded.color, label = excluded.label;
 
 insert into public.site_config (id, hero_tagline, hero_about, join_lab_url, community_description, community_url) values
-  (1, 'Building at the edge of AI, systems, and real-world problems.', 'We are an independent research lab focusing on building protocols, infrastructure, and AI tools for the future of the web.', 'https://shivoham-lab.github.io/join', 'Join our discord community to get updates, discuss research, and collaborate with us.', 'https://discord.gg/placeholder')
+  (1, 'Building at the edge of AI, systems and real world problems', 'We are an independent research lab focusing on building protocols, infrastructure, and AI tools for the future of the web.', 'https://shivoham-lab.github.io/join', 'Join our discord community to get updates, discuss research, and collaborate with us.', 'https://discord.gg/placeholder')
 on conflict (id) do nothing;
 
 insert into public.projects (title, description, stage, tags, github_url, order_index) values
@@ -100,5 +100,5 @@ insert into public.projects (title, description, stage, tags, github_url, order_
   ('Memex', 'MCP-based persistent memory server for AI assistants', 3, array['MCP', 'AI', 'Memory'], 'https://github.com/Shouraya-07/Memex', 2),
   ('Jugni', 'Self-hosted community music streaming app', 2, array['Music', 'Self-hosted', 'React'], null, 3);
 
-insert into public.team_members (type, name, role_label, username, bio, avatar_initials, github_url, order_index) values
-  ('member', 'Shouraya Sharma', 'FOUNDER & BUILDER', 'Shivoham_07', 'Also known as Shivoham. CS undergrad at MIT Bengaluru and the person driving product, research, and engineering at the lab.', 'SS', 'https://github.com/Shouraya-07', 1);
+insert into public.team_members (type, name, role_label, username, bio, avatar_initials, github_url, linkedin_url, instagram_url, order_index) values
+  ('member', 'Shouraya Sharma', 'FOUNDER & BUILDER', 'Shivoham_07', 'Also known as Shivoham. CS undergrad at MIT Bengaluru and the person driving product, research, and engineering at the lab.', 'SS', 'https://github.com/Shouraya-07', 'https://linkedin.com/in/shouraya-sharma', 'https://instagram.com/shourayasharma07', 1);

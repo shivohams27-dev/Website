@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { SiteConfig } from "@/lib/types";
+import { JoinFormButton } from "./ui/JoinFormButton";
 
 export function Hero({ config }: { config: SiteConfig }) {
   const containerVariants = {
@@ -48,7 +49,7 @@ export function Hero({ config }: { config: SiteConfig }) {
         </motion.h1>
 
         <motion.p variants={itemVariants} className="font-dm text-xl md:text-2xl text-text-primary/90 mb-8 max-w-2xl font-light">
-          {config?.hero_tagline || "Building at the edge of AI, systems, and real-world problems."}
+          {config?.hero_tagline || "Building at the edge of AI, systems and real world problems"}
         </motion.p>
 
         <motion.p variants={itemVariants} className="font-dm text-base md:text-lg text-text-muted mb-12 max-w-3xl leading-relaxed">
@@ -63,14 +64,10 @@ export function Hero({ config }: { config: SiteConfig }) {
             View Projects 
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
-          <a 
-            href={config?.join_lab_url || "#"} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto bg-transparent border border-accent/30 text-accent font-dm font-semibold px-8 py-4 rounded-lg hover:border-accent hover:bg-accent/5 transition-all duration-300 flex items-center justify-center"
-          >
-            Join the Lab
-          </a>
+          
+          <div className="flex items-center justify-center sm:ml-4">
+            <JoinFormButton url={config?.join_lab_url || "#"} />
+          </div>
         </motion.div>
       </motion.div>
     </section>
