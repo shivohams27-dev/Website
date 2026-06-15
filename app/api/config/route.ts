@@ -31,9 +31,13 @@ export async function PUT(request: Request) {
       })
       .eq('id', 1);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase error:", error);
+      throw error;
+    }
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    console.error("API Route error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
