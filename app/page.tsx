@@ -35,7 +35,7 @@ export default async function Home() {
 
   return (
     <InitialLoader>
-      <main className="min-h-screen bg-background relative selection:bg-accent/30 selection:text-white">
+      <main className="site-shell relative min-h-screen bg-background">
         <Navbar />
         
         <Hero config={config} />

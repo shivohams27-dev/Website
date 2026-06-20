@@ -2,17 +2,14 @@
 
 import { StageColor } from "@/lib/types";
 
-export function StageBadge({ stage, stageColors }: { stage: number, stageColors: StageColor[] }) {
-  const colorData = stageColors.find(c => c.stage === stage) || { color: '#6B7280', label: 'Unknown' };
-  
+export function StageBadge({ stage, stageColors }: { stage: number; stageColors: StageColor[] }) {
+  const colorData = stageColors.find((color) => color.stage === stage) || { color: "#8b8b83", label: "Unknown" };
+
   return (
-    <div className="flex items-center gap-2 border border-[#222] rounded-md px-2 py-1 bg-[#111] w-fit">
-      <div 
-        className="w-2 h-2 rounded-full" 
-        style={{ backgroundColor: colorData.color, boxShadow: `0 0 8px ${colorData.color}80` }}
-      />
-      <span className="font-jetbrains text-xs text-text-muted">
-        0{stage} {colorData.label}
+    <div className="flex items-center gap-2 rounded-md border border-white/10 bg-black/15 px-3 py-2">
+      <span className="h-2 w-2 rounded-full bg-accent" />
+      <span className="font-jetbrains text-[10px] uppercase tracking-[0.12em] text-text-muted">
+        Stage {stage}: {colorData.label}
       </span>
     </div>
   );

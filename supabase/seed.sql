@@ -24,6 +24,7 @@ create table if not exists public.projects (
   tags text[] default '{}',
   github_url text,
   explore_url text,
+  launch_date date,
   order_index int default 0,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
@@ -37,6 +38,7 @@ create table if not exists public.research_papers (
   venue text,
   year int,
   explore_url text,
+  launch_date date,
   order_index int default 0,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );

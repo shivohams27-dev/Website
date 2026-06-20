@@ -7,36 +7,26 @@ import { PlaceholderCard } from "./PlaceholderCard";
 
 export function Team({ members }: { members: TeamMember[] }) {
   return (
-    <section id="team" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-border/50">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <span className="font-jetbrains text-text-muted text-sm tracking-widest uppercase mb-4 block">
-          04 / Team
-        </span>
-        <h2 className="font-syne text-4xl md:text-5xl text-text-primary mb-12">The minds behind the lab.</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {members.map((member, i) => (
-            <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              {member.type === 'member' ? (
-                <TeamCard member={member} />
-              ) : (
-                <PlaceholderCard text={member.placeholder_text || 'Revealing Soon'} />
-              )}
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+    <section id="team" className="border-t border-white/10">
+      <div className="section-shell">
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
+          <div className="section-kicker">04 / People</div>
+          <div className="grid gap-8 lg:grid-cols-[1fr_30rem] lg:items-end">
+            <h2 className="section-heading">People at the lab.</h2>
+            <p className="font-dm text-base leading-8 text-text-muted lg:pb-2">
+              This directory identifies the people responsible for research, product decisions, engineering, and day-to-day operations at Shivoham Lab. Profile links are kept visible and accessible without hover-only interactions.
+            </p>
+          </div>
+
+          <div className="mt-14 space-y-5">
+            {members.map((member, index) => (
+              <motion.div key={member.id} initial={{ opacity: 0, y: 35 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.65, delay: Math.min(index * 0.1, 0.3) }}>
+                {member.type === "member" ? <TeamCard member={member} index={index} /> : <PlaceholderCard text={member.placeholder_text || "Revealing soon"} />}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }

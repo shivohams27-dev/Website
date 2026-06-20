@@ -22,6 +22,7 @@ export interface Project {
   tags: string[];
   github_url: string | null;
   explore_url: string | null;
+  launch_date: string | null;
   order_index: number;
   created_at: string;
 }
@@ -34,6 +35,7 @@ export interface ResearchPaper {
   venue: string | null;
   year: number | null;
   explore_url: string | null;
+  launch_date: string | null;
   order_index: number;
   created_at: string;
 }

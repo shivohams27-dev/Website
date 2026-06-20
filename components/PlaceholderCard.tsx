@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 
 export function PlaceholderCard({ text }: { text: string }) {
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      className="bg-[#161616] border-l-[3px] border-l-accent/50 border-y border-y-[#222] border-r border-r-[#222] rounded-xl p-6 flex items-center justify-center min-h-[250px] transition-all duration-300"
-    >
-      <span className="font-syne text-xl italic text-accent/60 tracking-wide">
-        {text}
-      </span>
+    <motion.div whileHover={{ y: -2 }} className="flex min-h-[13rem] items-center rounded-xl border border-dashed border-blue-300/20 bg-white/[0.012] p-8">
+      <div>
+        <span className="font-jetbrains text-[10px] uppercase tracking-[0.16em] text-text-muted">Additional team profile</span>
+        <p className="mt-3 font-syne text-3xl font-semibold text-text-primary/75">{text}</p>
+        <p className="mt-3 max-w-2xl font-dm text-sm leading-7 text-text-muted">
+          Details for this position will be published when the profile is ready.
+        </p>
+      </div>
     </motion.div>
   );
 }

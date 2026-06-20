@@ -1,23 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, ArrowRight, ExternalLink, MessageSquare, MessageCircle, ClipboardList, Send } from "lucide-react";
-import { GithubIcon, LinkedinIcon, InstagramIcon, YoutubeIcon, XIcon } from "./Icons";
+import { ArrowUpRight, ExternalLink, Mail, MessageCircle, Send, Users } from "lucide-react";
+import { GithubIcon, InstagramIcon, LinkedinIcon, XIcon, YoutubeIcon } from "./Icons";
 import { SiteConfig } from "@/lib/types";
-import { DynamicSocialGrid } from "./ui/DynamicSocialGrid";
-import { TelegramButton } from "./ui/TelegramButton";
-import { DiscordButton } from "./ui/DiscordButton";
-import { JoinFormButton } from "./ui/JoinFormButton";
 
 export function Contact({ config }: { config: SiteConfig }) {
   const getSocialIcon = (label: string) => {
-    const l = label.toLowerCase();
-    if (l.includes("github")) return GithubIcon;
-    if (l.includes("linkedin")) return LinkedinIcon;
-    if (l.includes("instagram") || l.includes("insta")) return InstagramIcon;
-    if (l.includes("youtube")) return YoutubeIcon;
-    if (l.includes("twitter") || l.includes("x.com") || l.match(/^x$/i)) return XIcon;
-    if (l.includes("mail") || l.includes("email")) return Mail;
+    const value = label.toLowerCase();
+    if (value.includes("github")) return GithubIcon;
+    if (value.includes("linkedin")) return LinkedinIcon;
+    if (value.includes("instagram")) return InstagramIcon;
+    if (value.includes("youtube")) return YoutubeIcon;
+    if (value.includes("twitter") || value === "x") return XIcon;
+    if (value.includes("mail") || value.includes("email")) return Mail;
     return ExternalLink;
   };
 
@@ -28,97 +24,81 @@ export function Contact({ config }: { config: SiteConfig }) {
     { label: "YouTube", url: "https://youtube.com/@ShivohamLab" },
   ];
 
-  return (
-    <section id="contact" className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-border/50">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <span className="font-jetbrains text-text-muted text-sm tracking-widest uppercase mb-4 block">
-          05 / Contact
-        </span>
-        <h2 className="font-syne text-4xl md:text-5xl text-text-primary mb-12">Connect with us.</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Card 1 - Socials */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-card border border-border rounded-xl p-8 flex flex-col items-center justify-center h-full min-h-[400px]"
-          >
-            <h3 className="font-syne text-2xl text-text-primary mb-12 self-start w-full">Find us online</h3>
-            <DynamicSocialGrid links={socialLinks} />
-          </motion.div>
+  const communityLinks = [
+    config?.discord_url && { label: "Discord", url: config.discord_url, icon: Users },
+    config?.telegram_url && { label: "Telegram", url: config.telegram_url, icon: Send },
+    config?.whatsapp_url && { label: "WhatsApp", url: config.whatsapp_url, icon: MessageCircle },
+    config?.form_url && { label: "Application form", url: config.form_url, icon: ExternalLink },
+    ...(config?.custom_links || []).map((link) => ({ ...link, icon: ExternalLink })),
+  ].filter(Boolean) as { label: string; url: string; icon: typeof ExternalLink }[];
 
-          {/* Card 2 - Community */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-card border border-border rounded-xl p-8 flex flex-col h-full relative overflow-hidden min-h-[400px]"
-          >
-            {/* Subtle glow background */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            
-            <h3 className="font-syne text-2xl text-text-primary mb-4 relative z-10">Join the Community</h3>
-            <p className="font-dm text-text-muted leading-relaxed mb-8 flex-grow relative z-10">
+  if (!communityLinks.length && config?.community_url) {
+    communityLinks.push({ label: "Join the community", url: config.community_url, icon: Users });
+  }
+
+  return (
+    <section id="contact" className="relative overflow-hidden border-t border-blue-400/15 bg-[#07090d] text-text-primary">
+      <div aria-hidden className="absolute inset-y-0 right-0 w-px bg-blue-400/20 md:right-[8%]" />
+      <div aria-hidden className="absolute bottom-0 left-0 h-px w-1/2 bg-blue-400/20" />
+      <div className="section-shell">
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
+          <div className="section-kicker">05 / Contact</div>
+          <div className="mt-6 grid gap-8 lg:grid-cols-[1.3fr_.7fr] lg:items-end">
+            <h2 className="font-syne text-[clamp(3.5rem,8vw,7.5rem)] font-semibold leading-[0.84] tracking-[-0.07em]">
+              Talk to <span className="text-accent">the lab.</span>
+            </h2>
+            <p className="max-w-sm font-dm text-sm leading-7 text-text-muted lg:pb-2">
               {config?.community_description || "Join our community to get updates, discuss research, and collaborate with us."}
             </p>
-            
-            <div className="flex flex-col gap-3 relative z-10 w-full items-start">
-              <div className="flex flex-row flex-wrap items-center justify-between w-full mb-8 px-2 gap-8">
-                {config?.discord_url && (
-                  <DiscordButton url={config.discord_url} />
-                )}
-                {config?.telegram_url && (
-                  <TelegramButton url={config.telegram_url} />
-                )}
-                {config?.form_url && (
-                  <JoinFormButton url={config.form_url} />
-                )}
-              </div>
-              {config?.whatsapp_url && (
-                <a
-                  href={config.whatsapp_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-dm font-semibold px-6 py-3 rounded-lg hover:bg-[#20bd5a] transition-colors w-full"
-                >
-                  <MessageCircle className="w-5 h-5" /> WhatsApp Group
-                </a>
-              )}
-              {config?.custom_links?.map((link, i) => (
-                <a
-                  key={i}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-[#111] text-white border border-border font-dm font-semibold px-6 py-3 rounded-lg hover:bg-[#222] transition-colors w-full"
-                >
-                  <ExternalLink className="w-5 h-5" /> {link.label}
-                </a>
-              ))}
-              {!config?.discord_url && !config?.whatsapp_url && !config?.form_url && !config?.telegram_url && (!config?.custom_links || config.custom_links.length === 0) && config?.community_url && (
-                <a
-                  href={config.community_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-accent text-[#0a0a0a] font-dm font-semibold px-6 py-3 rounded-lg hover:bg-white transition-colors w-full relative z-10"
-                >
-                  Join Now <ArrowRight className="w-5 h-5" />
-                </a>
-              )}
-            </div>
-          </motion.div>
+          </div>
 
-        </div>
-      </motion.div>
+          <div className="mt-16 grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[1.25rem] border border-blue-300/10 bg-[#0a0d12] p-6 md:p-8">
+              <span className="font-jetbrains text-[9px] uppercase tracking-[0.16em] text-text-muted">Find the lab</span>
+              <div className="mt-6 grid grid-cols-2 gap-2">
+                {socialLinks.map((link) => {
+                  const Icon = getSocialIcon(link.label);
+                  return (
+                    <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between rounded-xl border border-white/10 bg-[#0e1219] p-4 transition-all hover:-translate-y-0.5 hover:border-blue-400/40 hover:bg-[#111722]">
+                      <span className="flex items-center gap-3 font-dm text-sm font-medium">
+                        <Icon className="h-4 w-4 text-accent-soft" />
+                        {link.label}
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 text-text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-[1.25rem] border border-blue-400/25 bg-[#0b1018] p-6 text-white shadow-2xl shadow-black/20 md:p-8">
+              <div className="flex items-center justify-between">
+                <span className="font-jetbrains text-[9px] uppercase tracking-[0.16em] text-text-muted">Work and community</span>
+                <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_14px_var(--accent)]" />
+              </div>
+              <div className="mt-6 space-y-2">
+                {communityLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <a key={`${link.label}-${link.url}`} href={link.url} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between rounded-xl border border-white/10 px-4 py-4 transition-colors hover:border-accent/50 hover:bg-white/[0.04]">
+                      <span className="flex items-center gap-3 font-dm text-sm">
+                        <Icon className="h-4 w-4 text-accent-soft" />
+                        {link.label}
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 text-text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <footer className="mt-20 flex flex-col gap-4 border-t border-white/10 pt-6 font-jetbrains text-[9px] uppercase tracking-[0.14em] text-text-muted sm:flex-row sm:items-center sm:justify-between">
+            <span>© {new Date().getFullYear()} Shivoham Lab</span>
+            <span>Built openly. Maintained independently.</span>
+          </footer>
+        </motion.div>
+      </div>
     </section>
   );
 }

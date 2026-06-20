@@ -126,10 +126,14 @@ export function ProjectsTab() {
           <textarea required rows={3} value={editingProject.description || ""} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block font-jetbrains text-xs text-text-muted mb-2">Stage (1-5) *</label>
             <input type="number" min="1" max="5" required value={editingProject.stage || ""} onChange={e => setEditingProject({...editingProject, stage: parseInt(e.target.value)})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
+          </div>
+          <div>
+            <label className="block font-jetbrains text-xs text-text-muted mb-2">Launch Date</label>
+            <input type="date" value={editingProject.launch_date || ""} onChange={e => setEditingProject({...editingProject, launch_date: e.target.value || null})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none [color-scheme:dark]" />
           </div>
           <div>
             <label className="block font-jetbrains text-xs text-text-muted mb-2">Tags (comma separated)</label>
@@ -177,7 +181,9 @@ export function ProjectsTab() {
           <div key={p.id} className="bg-card border border-border rounded-lg p-4 flex items-center justify-between group">
             <div>
               <div className="font-syne text-text-primary">{p.title}</div>
-              <div className="font-jetbrains text-xs text-text-muted mt-1">Stage {p.stage}</div>
+              <div className="font-jetbrains text-xs text-text-muted mt-1">
+                Stage {p.stage}{p.launch_date ? ` · Launch ${p.launch_date}` : " · Launch date not set"}
+              </div>
             </div>
             
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

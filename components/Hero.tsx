@@ -1,75 +1,76 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { SiteConfig } from "@/lib/types";
-import { JoinFormButton } from "./ui/JoinFormButton";
+import { LabArtifact } from "./LabArtifact";
 
 export function Hero({ config }: { config: SiteConfig }) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants: any = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-  };
-
   const scrollToProjects = () => {
-    const projectsSection = document.getElementById("projects");
-    if (projectsSection) {
-      projectsSection.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pt-20">
-      {/* Background radial gradient & texture */}
-      <div className="absolute inset-0 bg-grid-texture opacity-[0.15] z-0" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] bg-accent/10 rounded-full blur-[120px] z-0 pointer-events-none" />
+    <section id="hero" className="relative min-h-screen overflow-hidden px-4 pb-14 pt-28 md:px-8 md:pt-32">
+      <div className="mx-auto grid min-h-[calc(100vh-9rem)] max-w-7xl items-center gap-12 lg:grid-cols-[1.02fr_.98fr]">
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10"
+        >
+          <h1 className="max-w-3xl font-syne text-[clamp(4.2rem,10vw,8.5rem)] font-semibold leading-[0.8] tracking-[-0.075em] text-text-primary">
+            Shivoham
+            <span className="block pl-[.58em] text-accent">Lab.</span>
+          </h1>
 
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="relative z-10 flex flex-col items-center text-center max-w-4xl"
-      >
-        <motion.div variants={itemVariants} className="mb-6">
-          <span className="font-jetbrains text-xs tracking-[0.2em] text-accent uppercase bg-accent/10 border border-accent/20 px-4 py-2 rounded-full">
-            Independent Research Lab
-          </span>
-        </motion.div>
+          <div className="mt-10 grid max-w-2xl gap-6 border-t border-white/10 pt-7 sm:grid-cols-[1fr_1.35fr]">
+            <div>
+              <span className="font-jetbrains text-[10px] uppercase tracking-[0.14em] text-accent-soft">Research focus</span>
+              <p className="mt-3 font-dm text-sm leading-7 text-text-muted">
+                The lab works across applied artificial intelligence, internet infrastructure, developer tooling, and self-hosted software.
+              </p>
+            </div>
+            <div>
+              <p className="font-dm text-xl leading-snug text-text-primary md:text-2xl">
+                {config?.hero_tagline || "Building at the edge of AI, systems and real world problems"}
+              </p>
+              <p className="mt-4 max-w-xl font-dm text-sm leading-7 text-text-muted md:text-base">
+                {config?.hero_about || "We are an independent research lab focusing on building protocols, infrastructure, and AI tools for the future of the web."}
+              </p>
+            </div>
+          </div>
 
-        <motion.h1 layoutId="hero-title" variants={itemVariants} className="font-syne text-6xl md:text-8xl font-bold text-text-primary mb-6 tracking-tight">
-          Shivoham Lab
-        </motion.h1>
-
-        <motion.p variants={itemVariants} className="font-dm text-xl md:text-2xl text-text-primary/90 mb-8 max-w-2xl font-light">
-          {config?.hero_tagline || "Building at the edge of AI, systems and real world problems"}
-        </motion.p>
-
-        <motion.p variants={itemVariants} className="font-dm text-base md:text-lg text-text-muted mb-12 max-w-3xl leading-relaxed">
-          {config?.hero_about || "We are an independent research lab focusing on building protocols, infrastructure, and AI tools for the future of the web."}
-        </motion.p>
-
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <button 
-            onClick={scrollToProjects}
-            className="w-full sm:w-auto bg-accent text-[#0a0a0a] font-dm font-semibold px-8 py-4 rounded-lg hover:bg-white transition-all duration-300 flex items-center justify-center gap-2 group"
-          >
-            View Projects 
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-          
-          <div className="flex items-center justify-center sm:ml-4">
-            <JoinFormButton url={config?.join_lab_url || "#"} />
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <button
+              onClick={scrollToProjects}
+              className="group inline-flex items-center gap-4 rounded-full bg-accent px-6 py-3.5 font-dm text-sm font-semibold text-[#02070d] shadow-[0_12px_40px_rgba(77,163,255,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-soft"
+            >
+              Explore the work
+              <ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
+            </button>
+            <a
+              href={config?.join_lab_url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3 rounded-full border border-white/15 px-6 py-3.5 font-dm text-sm text-text-primary transition-colors hover:border-accent/60 hover:bg-accent/5"
+            >
+              Work with the lab
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
           </div>
         </motion.div>
-      </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92, rotate: 3 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 1.15, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mx-auto w-full max-w-2xl"
+        >
+          <LabArtifact />
+        </motion.div>
+      </div>
+
     </section>
   );
 }
