@@ -10,9 +10,9 @@ export function Team({ members }: { members: TeamMember[] }) {
     <section id="team" className="border-t border-white/10">
       <div className="section-shell">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
-          <div className="section-kicker">04 / People</div>
+          <div className="section-kicker">04 / Team</div>
           <div className="grid gap-8 lg:grid-cols-[1fr_30rem] lg:items-end">
-            <h2 className="section-heading">People at the lab.</h2>
+            <h2 className="section-heading">Meet the team.</h2>
             <p className="font-dm text-base leading-8 text-text-muted lg:pb-2">
               This directory identifies the people responsible for research, product decisions, engineering, and day-to-day operations at Shivoham Lab. Profile links are kept visible and accessible without hover-only interactions.
             </p>

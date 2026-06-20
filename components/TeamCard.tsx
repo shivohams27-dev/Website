@@ -22,7 +22,6 @@ export function TeamCard({ member, index = 0 }: { member: TeamMember; index?: nu
             {member.avatar_initials || "?"}
           </span>
         )}
-        <span className="team-record-number">{String(index + 1).padStart(2, "0")}</span>
       </div>
 
       <div className="team-record-content">

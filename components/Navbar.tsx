@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import { useLoading } from "@/components/InitialLoader";
 
 const NAV_LINKS = [
   { id: "hero", label: "About" },
   { id: "projects", label: "Projects" },
   { id: "research", label: "Research" },
-  { id: "team", label: "People" },
+  { id: "team", label: "Team" },
   { id: "contact", label: "Contact" },
 ];
 
 export function Navbar() {
+  const loading = useLoading();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -57,7 +59,18 @@ export function Navbar() {
               <Image src="/s.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
             </span>
             <span>
-              <strong className="block font-syne text-sm font-semibold leading-none">Shivoham Lab</strong>
+              {!loading ? (
+                <motion.strong
+                  layoutId="site-title"
+                  className="block font-syne text-sm font-semibold leading-none"
+                >
+                  Shivoham Lab
+                </motion.strong>
+              ) : (
+                <strong className="block font-syne text-sm font-semibold leading-none invisible">
+                  Shivoham Lab
+                </strong>
+              )}
               <span className="mt-1 block font-jetbrains text-[8px] uppercase tracking-[0.18em] text-text-muted">
                 Independent R&amp;D
               </span>
