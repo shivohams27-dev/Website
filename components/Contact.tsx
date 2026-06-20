@@ -38,8 +38,6 @@ export function Contact({ config }: { config: SiteConfig }) {
 
   return (
     <section id="contact" className="relative overflow-hidden border-t border-blue-400/15 bg-[#07090d] text-text-primary">
-      <div aria-hidden className="absolute inset-y-0 right-0 w-px bg-blue-400/20 md:right-[8%]" />
-      <div aria-hidden className="absolute bottom-0 left-0 h-px w-1/2 bg-blue-400/20" />
       <div className="section-shell">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
           <div className="section-kicker">05 / Contact</div>
@@ -93,8 +91,9 @@ export function Contact({ config }: { config: SiteConfig }) {
             </div>
           </div>
 
-          <footer className="mt-20 flex flex-col gap-4 border-t border-white/10 pt-6 font-jetbrains text-[9px] uppercase tracking-[0.14em] text-text-muted sm:flex-row sm:items-center sm:justify-between">
-            <span>© {new Date().getFullYear()} Shivoham Lab</span>
+          <footer className="mt-24 flex flex-col items-center gap-3 pb-10 pt-10 text-center font-jetbrains text-[10px] uppercase tracking-[0.14em] text-text-muted/60 sm:flex-row sm:justify-between">
+            <span>&copy; {new Date().getFullYear()} Shivoham Lab</span>
+            <span className="hidden sm:inline">&middot;</span>
             <span>Built openly. Maintained independently.</span>
           </footer>
         </motion.div>
