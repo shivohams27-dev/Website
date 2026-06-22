@@ -1,36 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ResearchPaper } from "@/lib/types";
+import { ResearchPaper, Member } from "@/lib/types";
 import { useToast } from "../Toast";
 import { Edit2, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
 export function ResearchTab() {
   const [papers, setPapers] = useState<ResearchPaper[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPaper, setEditingPaper] = useState<Partial<ResearchPaper> | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPapers();
+    Promise.all([
+      fetch("/api/research").then(r => r.json()),
+      fetch("/api/members").then(r => r.json()),
+    ]).then(([resData, memData]) => {
+      if (Array.isArray(resData)) setPapers(resData);
+      else toast(resData.error || "Failed to load research papers", "error");
+      if (Array.isArray(memData)) setMembers(memData);
+    }).catch(() => toast("Failed to load data", "error")).finally(() => setLoading(false));
   }, []);
-
-  const fetchPapers = async () => {
-    try {
-      const res = await fetch("/api/research");
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setPapers(data);
-      } else {
-        toast(data.error || "Failed to load research papers", "error");
-        setPapers([]);
-      }
-    } catch (e) {
-      toast("Failed to load research papers", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,9 +49,17 @@ export function ResearchTab() {
         const errData = await res.json().catch(() => ({}));
         toast(errData.error || "Failed to save paper", "error");
       }
-    } catch (e) {
+    } catch {
       toast("Error saving paper", "error");
     }
+  };
+
+  const fetchPapers = async () => {
+    try {
+      const res = await fetch("/api/research");
+      const data = await res.json();
+      if (Array.isArray(data)) setPapers(data);
+    } catch {}
   };
 
   const handleDelete = async (id: string) => {
@@ -70,10 +69,8 @@ export function ResearchTab() {
       if (res.ok) {
         toast("Paper deleted", "success");
         fetchPapers();
-      } else {
-        toast("Failed to delete paper", "error");
       }
-    } catch (e) {
+    } catch {
       toast("Error deleting paper", "error");
     }
   };
@@ -84,13 +81,9 @@ export function ResearchTab() {
 
     const newPapers = [...papers];
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    
-    // Swap order_index
     const tempOrder = newPapers[index].order_index;
     newPapers[index].order_index = newPapers[swapIndex].order_index;
     newPapers[swapIndex].order_index = tempOrder;
-
-    // Swap positions
     [newPapers[index], newPapers[swapIndex]] = [newPapers[swapIndex], newPapers[index]];
     setPapers(newPapers);
 
@@ -103,24 +96,32 @@ export function ResearchTab() {
           { id: newPapers[swapIndex].id, order_index: newPapers[swapIndex].order_index }
         ]),
       });
-    } catch (e) {
+    } catch {
       toast("Failed to reorder", "error");
-      fetchPapers(); 
     }
   };
 
-  if (loading) return <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto"></div></div>;
+  const toggleContributor = (memberId: string) => {
+    if (!editingPaper) return;
+    const current = editingPaper.contributor_ids || [];
+    const next = current.includes(memberId)
+      ? current.filter(id => id !== memberId)
+      : [...current, memberId];
+    setEditingPaper({ ...editingPaper, contributor_ids: next });
+  };
+
+  if (loading) return <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto" /></div>;
 
   if (editingPaper) {
     return (
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <h3 className="font-syne text-xl text-text-primary mb-4">{editingPaper.id ? 'Edit Paper' : 'Add Paper'}</h3>
-        
+
         <div>
           <label className="block font-jetbrains text-xs text-text-muted mb-2">Title *</label>
           <input type="text" required value={editingPaper.title || ""} onChange={e => setEditingPaper({...editingPaper, title: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
         </div>
-        
+
         <div>
           <label className="block font-jetbrains text-xs text-text-muted mb-2">Abstract/Description *</label>
           <textarea required rows={4} value={editingPaper.description || ""} onChange={e => setEditingPaper({...editingPaper, description: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
@@ -150,6 +151,33 @@ export function ResearchTab() {
           <input type="text" value={editingPaper.explore_url || ""} onChange={e => setEditingPaper({...editingPaper, explore_url: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
         </div>
 
+        {members.length > 0 && (
+          <div className="border-t border-border pt-4 mt-2">
+            <label className="block font-jetbrains text-xs text-text-muted mb-3">Contributors (from Members)</label>
+            <div className="flex flex-wrap gap-2">
+              {members.map(member => {
+                const selected = (editingPaper.contributor_ids || []).includes(member.id);
+                return (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onClick={() => toggleContributor(member.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-dm transition-colors ${
+                      selected
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border bg-[#111] text-text-muted hover:border-white/20 hover:text-white"
+                    }`}
+                  >
+                    <div className={`w-2 h-2 rounded-full ${selected ? "bg-accent" : "bg-text-muted/30"}`} />
+                    {member.name}
+                    <span className="font-jetbrains text-[10px] opacity-60">@{member.username}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-4 mt-6">
           <button type="submit" className="bg-accent text-black font-semibold py-3 px-6 rounded-lg hover:bg-white transition-colors flex-grow">
             Save Paper
@@ -166,8 +194,8 @@ export function ResearchTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-syne text-xl text-text-primary">Manage Research Papers</h3>
-        <button 
-          onClick={() => setEditingPaper({ order_index: papers.length })}
+        <button
+          onClick={() => setEditingPaper({ order_index: papers.length, contributor_ids: [] })}
           className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Paper
@@ -181,9 +209,10 @@ export function ResearchTab() {
               <div className="font-syne text-text-primary">{p.title}</div>
               <div className="font-jetbrains text-xs text-text-muted mt-1">
                 Stage {p.stage}{p.launch_date ? ` · Publication ${p.launch_date}` : p.year ? ` · ${p.year}` : " · Publication date not set"}
+                {p.contributor_ids && p.contributor_ids.length > 0 ? ` · ${p.contributor_ids.length} contributors` : ""}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => moveItem(i, 'up')} disabled={i === 0} className="p-2 hover:text-accent disabled:opacity-30 disabled:hover:text-current transition-colors">
                 <ArrowUp className="w-4 h-4" />

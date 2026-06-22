@@ -9,6 +9,7 @@ import { ProjectsTab } from "./admin/ProjectsTab";
 import { ResearchTab } from "./admin/ResearchTab";
 import { TeamTab } from "./admin/TeamTab";
 import { StagesTab } from "./admin/StagesTab";
+import { MembersTab } from "./admin/MembersTab";
 
 export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   const [activeTab, setActiveTab] = useState("General");
@@ -75,7 +76,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
 
       {/* Tabs */}
       <div className="flex overflow-x-auto no-scrollbar border-b border-border px-6 bg-card">
-        {["General", "Projects", "Research", "Team", "Stages"].map(tab => (
+        {["General", "Projects", "Research", "Team", "Members", "Stages"].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -306,6 +307,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
             {activeTab === "Projects" && <ProjectsTab />}
             {activeTab === "Research" && <ResearchTab />}
             {activeTab === "Team" && <TeamTab />}
+            {activeTab === "Members" && <MembersTab />}
             {activeTab === "Stages" && <StagesTab />}
           </>
         )}

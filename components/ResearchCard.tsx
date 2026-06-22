@@ -1,17 +1,32 @@
 "use client";
 
-import { ArrowUpRight, FileText } from "lucide-react";
+import { motion } from "framer-motion";
+import { FileText, ChevronRight } from "lucide-react";
 import { ResearchPaper, StageColor } from "@/lib/types";
 import { StageBadge } from "./StageBadge";
 
 const formatDate = (date: string) =>
   new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
 
-export function ResearchCard({ paper, stageColors }: { paper: ResearchPaper; stageColors: StageColor[] }) {
+export function ResearchCard({
+  paper,
+  stageColors,
+  onExpand,
+}: {
+  paper: ResearchPaper;
+  stageColors: StageColor[];
+  onExpand: (paper: ResearchPaper) => void;
+}) {
   const publication = [paper.venue, paper.year].filter(Boolean).join(" · ");
 
   return (
-    <article className="research-record group">
+    <motion.article
+      className="research-record group"
+      style={{ cursor: "pointer" }}
+      onClick={() => onExpand(paper)}
+      whileHover={{ y: -3, borderColor: "rgba(77, 163, 255, 0.4)" }}
+      transition={{ duration: 0.25 }}
+    >
       <div className="research-record-body">
         <StageBadge stage={paper.stage} stageColors={stageColors} />
         <div className="flex items-center gap-2 font-jetbrains text-[10px] uppercase tracking-[0.14em] text-text-muted">
@@ -27,24 +42,30 @@ export function ResearchCard({ paper, stageColors }: { paper: ResearchPaper; sta
       </div>
 
       <div className="research-record-footer">
-        <span className="font-dm text-sm text-text-muted">
-          {paper.stage === 5 ? "Published and available to read." : "Work in progress; publication details will be added when available."}
-        </span>
         <div className="flex items-center gap-4">
+          <span className="font-dm text-sm text-text-muted">
+            {paper.stage === 5 ? "Published and available to read." : "Work in progress; publication details will be added when available."}
+          </span>
           {paper.launch_date && (
             <div className="text-right">
               <span className="block font-jetbrains text-[10px] uppercase tracking-[0.12em] text-text-muted">Publication date</span>
               <strong className="block font-dm text-sm font-medium text-accent-soft">{formatDate(paper.launch_date)}</strong>
             </div>
           )}
-          {paper.stage === 5 && paper.explore_url && (
-            <a href={paper.explore_url} target="_blank" rel="noopener noreferrer" className="record-link record-link-primary">
-              Read publication
-              <ArrowUpRight className="h-4 w-4" />
-            </a>
-          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onExpand(paper);
+            }}
+            className="group/btn inline-flex items-center gap-1.5 font-dm text-sm font-medium text-accent transition-colors hover:text-accent-soft"
+          >
+            Know more
+            <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+          </button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

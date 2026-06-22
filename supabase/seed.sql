@@ -25,6 +25,7 @@ create table if not exists public.projects (
   github_url text,
   explore_url text,
   launch_date date,
+  contributor_ids uuid[] default '{}',
   order_index int default 0,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
@@ -39,6 +40,7 @@ create table if not exists public.research_papers (
   year int,
   explore_url text,
   launch_date date,
+  contributor_ids uuid[] default '{}',
   order_index int default 0,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
@@ -61,7 +63,23 @@ create table if not exists public.team_members (
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- 5. stage_colors
+-- 5. members
+create table if not exists public.members (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  username text not null,
+  profile_pic text,
+  role text not null default '',
+  description text not null default '',
+  linkedin_url text,
+  github_url text,
+  instagram_url text,
+  custom_link_url text,
+  order_index int default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 6. stage_colors
 create table if not exists public.stage_colors (
   stage int primary key check (stage between 1 and 5),
   color text not null,
@@ -73,6 +91,7 @@ alter table public.site_config enable row level security;
 alter table public.projects enable row level security;
 alter table public.research_papers enable row level security;
 alter table public.team_members enable row level security;
+alter table public.members enable row level security;
 alter table public.stage_colors enable row level security;
 
 -- Public read access policies
@@ -80,6 +99,7 @@ create policy "Allow public read access on site_config" on public.site_config fo
 create policy "Allow public read access on projects" on public.projects for select using (true);
 create policy "Allow public read access on research_papers" on public.research_papers for select using (true);
 create policy "Allow public read access on team_members" on public.team_members for select using (true);
+create policy "Allow public read access on members" on public.members for select using (true);
 create policy "Allow public read access on stage_colors" on public.stage_colors for select using (true);
 
 -- (Write access is strictly enforced by API routes using the service role key, which bypasses RLS)

@@ -23,6 +23,7 @@ export interface Project {
   github_url: string | null;
   explore_url: string | null;
   launch_date: string | null;
+  contributor_ids: string[];
   order_index: number;
   created_at: string;
 }
@@ -36,6 +37,7 @@ export interface ResearchPaper {
   year: number | null;
   explore_url: string | null;
   launch_date: string | null;
+  contributor_ids: string[];
   order_index: number;
   created_at: string;
 }
@@ -53,6 +55,21 @@ export interface TeamMember {
   instagram_url: string | null;
   github_url: string | null;
   placeholder_text: string | null;
+  order_index: number;
+  created_at: string;
+}
+
+export interface Member {
+  id: string;
+  name: string;
+  username: string;
+  profile_pic: string | null;
+  role: string;
+  description: string;
+  linkedin_url: string | null;
+  github_url: string | null;
+  instagram_url: string | null;
+  custom_link_url: string | null;
   order_index: number;
   created_at: string;
 }

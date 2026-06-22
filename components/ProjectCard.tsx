@@ -1,16 +1,30 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
-import { GithubIcon } from "./Icons";
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
 import { Project, StageColor } from "@/lib/types";
 import { StageBadge } from "./StageBadge";
 
 const formatDate = (date: string) =>
   new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
 
-export function ProjectCard({ project, stageColors }: { project: Project; stageColors: StageColor[] }) {
+export function ProjectCard({
+  project,
+  stageColors,
+  onExpand,
+}: {
+  project: Project;
+  stageColors: StageColor[];
+  onExpand: (project: Project) => void;
+}) {
   return (
-    <article className="professional-record group">
+    <motion.article
+      className="professional-record group"
+      style={{ cursor: "pointer" }}
+      onClick={() => onExpand(project)}
+      whileHover={{ y: -3, borderColor: "rgba(77, 163, 255, 0.4)" }}
+      transition={{ duration: 0.25 }}
+    >
       <div className="professional-record-content">
         <div className="flex flex-wrap items-center gap-3">
           <StageBadge stage={project.stage} stageColors={stageColors} />
@@ -42,19 +56,17 @@ export function ProjectCard({ project, stageColors }: { project: Project; stageC
             <strong className="block font-dm text-sm font-medium text-accent-soft">{formatDate(project.launch_date)}</strong>
           </div>
         )}
-        {project.github_url && (
-          <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="record-link">
-            <GithubIcon className="h-4 w-4" />
-            Source code
-          </a>
-        )}
-        {project.stage === 5 && project.explore_url && (
-          <a href={project.explore_url} target="_blank" rel="noopener noreferrer" className="record-link record-link-primary">
-            View project
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onExpand(project);
+          }}
+          className="group/btn inline-flex items-center gap-1.5 font-dm text-sm font-medium text-accent transition-colors hover:text-accent-soft"
+        >
+          Know more
+          <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+        </button>
       </div>
-    </article>
+    </motion.article>
   );
 }

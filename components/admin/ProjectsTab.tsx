@@ -1,36 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Project } from "@/lib/types";
+import { Project, Member } from "@/lib/types";
 import { useToast } from "../Toast";
 import { Edit2, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
 export function ProjectsTab() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchProjects();
+    Promise.all([
+      fetch("/api/projects").then(r => r.json()),
+      fetch("/api/members").then(r => r.json()),
+    ]).then(([projData, memData]) => {
+      if (Array.isArray(projData)) setProjects(projData);
+      else toast(projData.error || "Failed to load projects", "error");
+      if (Array.isArray(memData)) setMembers(memData);
+    }).catch(() => toast("Failed to load data", "error")).finally(() => setLoading(false));
   }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch("/api/projects");
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setProjects(data);
-      } else {
-        toast(data.error || "Failed to load projects", "error");
-        setProjects([]);
-      }
-    } catch (e) {
-      toast("Failed to load projects", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +54,14 @@ export function ProjectsTab() {
     }
   };
 
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch("/api/projects");
+      const data = await res.json();
+      if (Array.isArray(data)) setProjects(data);
+    } catch {}
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
     try {
@@ -70,10 +69,8 @@ export function ProjectsTab() {
       if (res.ok) {
         toast("Project deleted", "success");
         fetchProjects();
-      } else {
-        toast("Failed to delete project", "error");
       }
-    } catch (e) {
+    } catch {
       toast("Error deleting project", "error");
     }
   };
@@ -84,13 +81,9 @@ export function ProjectsTab() {
 
     const newProjects = [...projects];
     const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    
-    // Swap order_index
     const tempOrder = newProjects[index].order_index;
     newProjects[index].order_index = newProjects[swapIndex].order_index;
     newProjects[swapIndex].order_index = tempOrder;
-
-    // Swap positions in array for optimistic UI
     [newProjects[index], newProjects[swapIndex]] = [newProjects[swapIndex], newProjects[index]];
     setProjects(newProjects);
 
@@ -103,24 +96,32 @@ export function ProjectsTab() {
           { id: newProjects[swapIndex].id, order_index: newProjects[swapIndex].order_index }
         ]),
       });
-    } catch (e) {
+    } catch {
       toast("Failed to reorder", "error");
-      fetchProjects(); // Revert
     }
   };
 
-  if (loading) return <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto"></div></div>;
+  const toggleContributor = (memberId: string) => {
+    if (!editingProject) return;
+    const current = editingProject.contributor_ids || [];
+    const next = current.includes(memberId)
+      ? current.filter(id => id !== memberId)
+      : [...current, memberId];
+    setEditingProject({ ...editingProject, contributor_ids: next });
+  };
+
+  if (loading) return <div className="text-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto" /></div>;
 
   if (editingProject) {
     return (
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <h3 className="font-syne text-xl text-text-primary mb-4">{editingProject.id ? 'Edit Project' : 'New Project'}</h3>
-        
+
         <div>
           <label className="block font-jetbrains text-xs text-text-muted mb-2">Title *</label>
           <input type="text" required value={editingProject.title || ""} onChange={e => setEditingProject({...editingProject, title: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
         </div>
-        
+
         <div>
           <label className="block font-jetbrains text-xs text-text-muted mb-2">Description *</label>
           <textarea required rows={3} value={editingProject.description || ""} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="w-full bg-card border border-border rounded-lg p-3 text-text-primary focus:border-accent outline-none" />
@@ -152,6 +153,33 @@ export function ProjectsTab() {
           </div>
         </div>
 
+        {members.length > 0 && (
+          <div className="border-t border-border pt-4 mt-2">
+            <label className="block font-jetbrains text-xs text-text-muted mb-3">Contributors (from Members)</label>
+            <div className="flex flex-wrap gap-2">
+              {members.map(member => {
+                const selected = (editingProject.contributor_ids || []).includes(member.id);
+                return (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onClick={() => toggleContributor(member.id)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-dm transition-colors ${
+                      selected
+                        ? "border-accent bg-accent/10 text-accent"
+                        : "border-border bg-[#111] text-text-muted hover:border-white/20 hover:text-white"
+                    }`}
+                  >
+                    <div className={`w-2 h-2 rounded-full ${selected ? "bg-accent" : "bg-text-muted/30"}`} />
+                    {member.name}
+                    <span className="font-jetbrains text-[10px] opacity-60">@{member.username}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-4 mt-6">
           <button type="submit" className="bg-accent text-black font-semibold py-3 px-6 rounded-lg hover:bg-white transition-colors flex-grow">
             Save Project
@@ -168,8 +196,8 @@ export function ProjectsTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-syne text-xl text-text-primary">Manage Projects</h3>
-        <button 
-          onClick={() => setEditingProject({ order_index: projects.length, tags: [] })}
+        <button
+          onClick={() => setEditingProject({ order_index: projects.length, tags: [], contributor_ids: [] })}
           className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Project
@@ -183,9 +211,10 @@ export function ProjectsTab() {
               <div className="font-syne text-text-primary">{p.title}</div>
               <div className="font-jetbrains text-xs text-text-muted mt-1">
                 Stage {p.stage}{p.launch_date ? ` · Launch ${p.launch_date}` : " · Launch date not set"}
+                {p.contributor_ids && p.contributor_ids.length > 0 ? ` · ${p.contributor_ids.length} contributors` : ""}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => moveItem(i, 'up')} disabled={i === 0} className="p-2 hover:text-accent disabled:opacity-30 disabled:hover:text-current transition-colors">
                 <ArrowUp className="w-4 h-4" />
