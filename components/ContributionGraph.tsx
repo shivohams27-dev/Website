@@ -245,30 +245,18 @@ export function ContributionGraph({ contributors }: ContributionGraphProps) {
         ctx.arc(x, y, radius - 2, 0, Math.PI * 2);
         ctx.clip();
 
-        const initials = getInitials(member.name);
-        const fontSize = Math.max(10, radius * 0.5);
-        ctx.font = `600 ${fontSize}px "DM Sans", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
         if (member.profile_pic) {
           const img = getCachedImage(member.profile_pic);
           if (img.complete && img.naturalWidth > 0) {
             const size = (radius - 2) * 2;
             ctx.drawImage(img, x - radius + 2, y - radius + 2, size, size);
-            ctx.fillStyle = "rgba(8, 11, 17, 0.4)";
-            ctx.fillRect(x - radius + 2, y - radius + 2, size, size);
-            ctx.fillStyle = "#f7f9fc";
-            ctx.fillText(initials, x, y);
           } else {
             ctx.fillStyle = darkenColor(color, 30);
             ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-            ctx.fillStyle = "#f7f9fc";
-            ctx.fillText(initials, x, y);
           }
         } else {
-          ctx.fillStyle = "#f7f9fc";
-          ctx.fillText(initials, x, y);
+          ctx.fillStyle = darkenColor(color, 30);
+          ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
         }
 
         ctx.restore();
@@ -395,30 +383,18 @@ export function ContributionGraph({ contributors }: ContributionGraphProps) {
               ctx.arc(x, y, radius - 2, 0, Math.PI * 2);
               ctx.clip();
 
-              const initials = getInitials(member.name);
-              const fontSize = Math.max(10, radius * 0.5);
-              ctx.font = `600 ${fontSize}px "DM Sans", sans-serif`;
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-
               if (member.profile_pic) {
                 const img = getCachedImage(member.profile_pic);
                 if (img.complete && img.naturalWidth > 0) {
                   const size = (radius - 2) * 2;
                   ctx.drawImage(img, x - radius + 2, y - radius + 2, size, size);
-                  ctx.fillStyle = "rgba(8, 11, 17, 0.4)";
-                  ctx.fillRect(x - radius + 2, y - radius + 2, size, size);
-                  ctx.fillStyle = "#f7f9fc";
-                  ctx.fillText(initials, x, y);
                 } else {
                   ctx.fillStyle = darkenColor(color, 30);
                   ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-                  ctx.fillStyle = "#f7f9fc";
-                  ctx.fillText(initials, x, y);
                 }
               } else {
-                ctx.fillStyle = "#f7f9fc";
-                ctx.fillText(initials, x, y);
+                ctx.fillStyle = darkenColor(color, 30);
+                ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
               }
               ctx.restore();
 
