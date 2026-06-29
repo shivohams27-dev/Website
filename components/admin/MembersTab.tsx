@@ -54,6 +54,8 @@ export function MembersTab() {
   const [form, setForm] = useState(emptyMember);
   const [editId, setEditId] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export function MembersTab() {
     try {
       const res = await fetch("/api/members");
       setMembers(await res.json());
+      setOrderDirty(false);
     } catch {
       toast("Failed to load members", "error");
     } finally {
@@ -140,14 +143,28 @@ export function MembersTab() {
     if (swapIndex < 0 || swapIndex >= newMembers.length) return;
     [newMembers[index], newMembers[swapIndex]] = [newMembers[swapIndex], newMembers[index]];
     setMembers(newMembers);
+    setOrderDirty(true);
+  };
+
+  const saveOrder = async () => {
+    setSavingOrder(true);
     try {
-      await fetch("/api/members", {
+      const payload = members.map((m, i) => ({ id: m.id, order_index: i }));
+      const res = await fetch("/api/members", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newMembers.map((m, i) => ({ id: m.id, order_index: i }))),
+        body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        setOrderDirty(false);
+        toast("Order saved", "success");
+      } else {
+        toast("Failed to save order", "error");
+      }
     } catch {
-      toast("Failed to reorder", "error");
+      toast("Failed to save order", "error");
+    } finally {
+      setSavingOrder(false);
     }
   };
 
@@ -274,9 +291,29 @@ export function MembersTab() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-syne text-xl font-semibold text-text-primary">Members ({members.length})</h3>
-        <button onClick={() => setEditing(true)} className="flex items-center gap-2 text-sm text-accent hover:text-white transition-colors bg-[#111] px-4 py-2 rounded-lg border border-border">
-          <Plus className="w-4 h-4" /> Add Member
-        </button>
+        <div className="flex items-center gap-3">
+          {orderDirty && (
+            <>
+              <button
+                onClick={fetchMembers}
+                disabled={savingOrder}
+                className="border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveOrder}
+                disabled={savingOrder}
+                className="bg-accent text-black font-semibold px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm flex items-center gap-2"
+              >
+                {savingOrder ? "Saving..." : "Save Order"}
+              </button>
+            </>
+          )}
+          <button onClick={() => setEditing(true)} className="flex items-center gap-2 text-sm text-accent hover:text-white transition-colors bg-[#111] px-4 py-2 rounded-lg border border-border">
+            <Plus className="w-4 h-4" /> Add Member
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-2">
         {members.map((member, index) => (

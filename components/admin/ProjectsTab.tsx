@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Project, Member } from "@/lib/types";
 import { useToast } from "../Toast";
 import { Edit2, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
@@ -10,6 +10,9 @@ export function ProjectsTab() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const originalOrderRef = useRef<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -17,7 +20,10 @@ export function ProjectsTab() {
       fetch("/api/projects").then(r => r.json()),
       fetch("/api/members").then(r => r.json()),
     ]).then(([projData, memData]) => {
-      if (Array.isArray(projData)) setProjects(projData);
+      if (Array.isArray(projData)) {
+        setProjects(projData);
+        originalOrderRef.current = projData.map((p: Project) => p.id);
+      }
       else toast(projData.error || "Failed to load projects", "error");
       if (Array.isArray(memData)) setMembers(memData);
     }).catch(() => toast("Failed to load data", "error")).finally(() => setLoading(false));
@@ -58,7 +64,11 @@ export function ProjectsTab() {
     try {
       const res = await fetch("/api/projects");
       const data = await res.json();
-      if (Array.isArray(data)) setProjects(data);
+      if (Array.isArray(data)) {
+        setProjects(data);
+        originalOrderRef.current = data.map((p: Project) => p.id);
+        setOrderDirty(false);
+      }
     } catch {}
   };
 
@@ -86,19 +96,34 @@ export function ProjectsTab() {
     newProjects[swapIndex].order_index = tempOrder;
     [newProjects[index], newProjects[swapIndex]] = [newProjects[swapIndex], newProjects[index]];
     setProjects(newProjects);
+    setOrderDirty(true);
+  };
 
+  const saveOrder = async () => {
+    setSavingOrder(true);
     try {
-      await fetch("/api/projects", {
+      const payload = projects.map(p => ({ id: p.id, order_index: p.order_index }));
+      const res = await fetch("/api/projects", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([
-          { id: newProjects[index].id, order_index: newProjects[index].order_index },
-          { id: newProjects[swapIndex].id, order_index: newProjects[swapIndex].order_index }
-        ]),
+        body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        originalOrderRef.current = projects.map(p => p.id);
+        setOrderDirty(false);
+        toast("Order saved", "success");
+      } else {
+        toast("Failed to save order", "error");
+      }
     } catch {
-      toast("Failed to reorder", "error");
+      toast("Failed to save order", "error");
+    } finally {
+      setSavingOrder(false);
     }
+  };
+
+  const resetOrder = () => {
+    fetchProjects();
   };
 
   const toggleContributor = (memberId: string) => {
@@ -196,12 +221,32 @@ export function ProjectsTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-syne text-xl text-text-primary">Manage Projects</h3>
-        <button
-          onClick={() => setEditingProject({ order_index: projects.length, tags: [], contributor_ids: [] })}
-          className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add Project
-        </button>
+        <div className="flex items-center gap-3">
+          {orderDirty && (
+            <>
+              <button
+                onClick={resetOrder}
+                disabled={savingOrder}
+                className="border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveOrder}
+                disabled={savingOrder}
+                className="bg-accent text-black font-semibold px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm flex items-center gap-2"
+              >
+                {savingOrder ? "Saving..." : "Save Order"}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setEditingProject({ order_index: projects.length, tags: [], contributor_ids: [] })}
+            className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Add Project
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">

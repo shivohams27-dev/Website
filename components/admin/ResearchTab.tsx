@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ResearchPaper, Member } from "@/lib/types";
 import { useToast } from "../Toast";
 import { Edit2, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
@@ -10,6 +10,9 @@ export function ResearchTab() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPaper, setEditingPaper] = useState<Partial<ResearchPaper> | null>(null);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const originalOrderRef = useRef<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -17,7 +20,10 @@ export function ResearchTab() {
       fetch("/api/research").then(r => r.json()),
       fetch("/api/members").then(r => r.json()),
     ]).then(([resData, memData]) => {
-      if (Array.isArray(resData)) setPapers(resData);
+      if (Array.isArray(resData)) {
+        setPapers(resData);
+        originalOrderRef.current = resData.map((p: ResearchPaper) => p.id);
+      }
       else toast(resData.error || "Failed to load research papers", "error");
       if (Array.isArray(memData)) setMembers(memData);
     }).catch(() => toast("Failed to load data", "error")).finally(() => setLoading(false));
@@ -58,7 +64,11 @@ export function ResearchTab() {
     try {
       const res = await fetch("/api/research");
       const data = await res.json();
-      if (Array.isArray(data)) setPapers(data);
+      if (Array.isArray(data)) {
+        setPapers(data);
+        originalOrderRef.current = data.map((p: ResearchPaper) => p.id);
+        setOrderDirty(false);
+      }
     } catch {}
   };
 
@@ -86,19 +96,34 @@ export function ResearchTab() {
     newPapers[swapIndex].order_index = tempOrder;
     [newPapers[index], newPapers[swapIndex]] = [newPapers[swapIndex], newPapers[index]];
     setPapers(newPapers);
+    setOrderDirty(true);
+  };
 
+  const saveOrder = async () => {
+    setSavingOrder(true);
     try {
-      await fetch("/api/research", {
+      const payload = papers.map(p => ({ id: p.id, order_index: p.order_index }));
+      const res = await fetch("/api/research", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([
-          { id: newPapers[index].id, order_index: newPapers[index].order_index },
-          { id: newPapers[swapIndex].id, order_index: newPapers[swapIndex].order_index }
-        ]),
+        body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        originalOrderRef.current = papers.map(p => p.id);
+        setOrderDirty(false);
+        toast("Order saved", "success");
+      } else {
+        toast("Failed to save order", "error");
+      }
     } catch {
-      toast("Failed to reorder", "error");
+      toast("Failed to save order", "error");
+    } finally {
+      setSavingOrder(false);
     }
+  };
+
+  const resetOrder = () => {
+    fetchPapers();
   };
 
   const toggleContributor = (memberId: string) => {
@@ -194,12 +219,32 @@ export function ResearchTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-syne text-xl text-text-primary">Manage Research Papers</h3>
-        <button
-          onClick={() => setEditingPaper({ order_index: papers.length, contributor_ids: [] })}
-          className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add Paper
-        </button>
+        <div className="flex items-center gap-3">
+          {orderDirty && (
+            <>
+              <button
+                onClick={resetOrder}
+                disabled={savingOrder}
+                className="border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveOrder}
+                disabled={savingOrder}
+                className="bg-accent text-black font-semibold px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm flex items-center gap-2"
+              >
+                {savingOrder ? "Saving..." : "Save Order"}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setEditingPaper({ order_index: papers.length, contributor_ids: [] })}
+            className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Add Paper
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">

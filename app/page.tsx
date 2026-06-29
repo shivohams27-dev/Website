@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
@@ -8,10 +9,14 @@ import { Contact } from "@/components/Contact";
 import { InitialLoader } from "@/components/InitialLoader";
 import { SiteConfig, Project, ResearchPaper, TeamMember, StageColor } from "@/lib/types";
 
-// Force dynamic rendering to ensure fresh data (in production you might use ISR)
+// Force dynamic rendering to ensure fresh data on every request (Vercel edge cache bypass)
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Home() {
+  // Access headers to force dynamic rendering and prevent caching
+  headers();
+
   // Fetch all data server-side
   const [
     { data: configData },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TeamMember } from "@/lib/types";
 import { useToast } from "../Toast";
 import { Edit2, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
@@ -9,6 +9,9 @@ export function TeamTab() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingMember, setEditingMember] = useState<Partial<TeamMember> | null>(null);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const originalOrderRef = useRef<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -21,6 +24,8 @@ export function TeamTab() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setMembers(data);
+        originalOrderRef.current = data.map((m: TeamMember) => m.id);
+        setOrderDirty(false);
       } else {
         toast(data.error || "Failed to load team members", "error");
         setMembers([]);
@@ -97,19 +102,29 @@ export function TeamTab() {
     // Swap positions
     [newMembers[index], newMembers[swapIndex]] = [newMembers[swapIndex], newMembers[index]];
     setMembers(newMembers);
+    setOrderDirty(true);
+  };
 
+  const saveOrder = async () => {
+    setSavingOrder(true);
     try {
-      await fetch("/api/team", {
+      const payload = members.map(m => ({ id: m.id, order_index: m.order_index }));
+      const res = await fetch("/api/team", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([
-          { id: newMembers[index].id, order_index: newMembers[index].order_index },
-          { id: newMembers[swapIndex].id, order_index: newMembers[swapIndex].order_index }
-        ]),
+        body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        originalOrderRef.current = members.map(m => m.id);
+        setOrderDirty(false);
+        toast("Order saved", "success");
+      } else {
+        toast("Failed to save order", "error");
+      }
     } catch (e) {
-      toast("Failed to reorder", "error");
-      fetchMembers();
+      toast("Failed to save order", "error");
+    } finally {
+      setSavingOrder(false);
     }
   };
 
@@ -194,19 +209,39 @@ export function TeamTab() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-syne text-xl text-text-primary">Manage Team</h3>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setEditingMember({ type: 'member', order_index: members.length })}
-            className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Member
-          </button>
-          <button 
-            onClick={() => setEditingMember({ type: 'placeholder', order_index: members.length })}
-            className="bg-transparent border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Placeholder
-          </button>
+        <div className="flex items-center gap-3">
+          {orderDirty && (
+            <>
+              <button
+                onClick={fetchMembers}
+                disabled={savingOrder}
+                className="border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveOrder}
+                disabled={savingOrder}
+                className="bg-accent text-black font-semibold px-4 py-2 rounded-lg hover:bg-white transition-colors text-sm flex items-center gap-2"
+              >
+                {savingOrder ? "Saving..." : "Save Order"}
+              </button>
+            </>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setEditingMember({ type: 'member', order_index: members.length })}
+              className="bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Member
+            </button>
+            <button
+              onClick={() => setEditingMember({ type: 'placeholder', order_index: members.length })}
+              className="bg-transparent border border-border text-text-muted hover:text-white px-4 py-2 rounded-lg font-dm text-sm flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Placeholder
+            </button>
+          </div>
         </div>
       </div>
 
