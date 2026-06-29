@@ -22,12 +22,15 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  // Used for reordering
   if (!(await verifyAuth())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json(); // Array of {id, order_index}
-    const { error } = await supabaseAdmin.from('projects').upsert(body);
-    if (error) throw error;
+    const updates = body.map((item: { id: string; order_index: number }) =>
+      supabaseAdmin.from('projects').update({ order_index: item.order_index }).eq('id', item.id)
+    );
+    const results = await Promise.all(updates);
+    const err = results.find(r => r.error);
+    if (err?.error) throw err.error;
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
