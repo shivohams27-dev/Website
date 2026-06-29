@@ -3,6 +3,7 @@ import { Syne, JetBrains_Mono, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/Toast";
+import { Analytics } from '@vercel/analytics/next';
 
 const syne = Syne({
   subsets: ["latin"],
